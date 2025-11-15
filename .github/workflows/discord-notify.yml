@@ -1,18 +1,15 @@
-name: Discord Update Notification
+name: Discord Notification
 
 on:
   push:
-    paths:
-      - 'updates/update-log.md'
 
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Send update to Discord
+      - name: Send Discord message
         run: |
-          CONTENT=$(cat updates/update-log.md | jq -Rs .)
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d "{\"content\": \"**[SA-MP Server Update]**\n$CONTENT\"}" \
+               -d "{\"content\": \"New push to the repository!\"}" \
                ${{ secrets.DISCORD_WEBHOOK_URL }}
