@@ -1,15 +1,26 @@
-name: Discord Notification
-
+name: Discord Update
 on:
   push:
+    paths:
+      - 'updates/update-log.md'  # Only trigger when this file changes
 
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Discord message
+      - uses: actions/checkout@v3
+
+      - name: Read update log
+        id: read
         run: |
-          curl -H "Content-Type: application/json" \
-               -X POST \
-               -d "{\"content\": \"New push to the repository!\"}" \
-               ${{ secrets.DISCORD_WEBHOOK_URL }}
+          echo "UPDATE_LOG<<EOF" >> $GITHUB_ENV
+          cat updates/update-log.md >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Send to Discord
+        uses: Ilshidur/action-discord@v2
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          message: |
+            **[SA-MP Server Update]**
+            ${{ env.UPDATE_LOG }}
